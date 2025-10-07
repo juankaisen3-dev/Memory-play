@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DANIEL_Memory Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Press Start 2P', cursive;
+      background-color: #1a1a2e;
+      color: #00ffcc;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      text-shadow: 0 0 10px #00ffcc;
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      background-color: #222;
+      border: 2px solid #00ffcc;
+      border-radius: 10px;
+      font-size: 2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00ffcc;
+      transition: background-color 0.3s;
+    }
+
+    .card.revealed {
+      background-color: #00ffcc;
+      color: #1a1a2e;
+    }
+
+    .card.matched {
+      background-color: #ff00ff;
+      color: #fff;
+      cursor: default;
+    }
+
+    #reset {
+      margin-top: 30px;
+      padding: 10px 20px;
+      background-color: #00ffcc;
+      border: none;
+      border-radius: 5px;
+      font-family: 'Press Start 2P', cursive;
+      cursor: pointer;
+    }
+
+    #reset:hover {
+      background-color: #00ffaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧠 JUAN Memory Game 🧠</h1>
+  <div class="game-board" id="board"></div>
+  <button id="reset" onclick="startGame()">🔁 Rejouer</button>
+
+  <script>
+    const emojis = ['🐱','🐱','👾','👾','🚀','🚀','🎮','🎮','💻','💻','🧠','🧠','🦾','🦾','🧬','🧬'];
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+
+    function startGame() {
+      const board = document.getElementById('board');
+      board.innerHTML = '';
+      const shuffled = emojis.sort(() => 0.5 - Math.random());
+
+      shuffled.forEach((emoji, index) => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.dataset.emoji = emoji;
+        card.dataset.index = index;
+        card.innerText = '';
+        card.addEventListener('click', revealCard);
+        board.appendChild(card);
+      });
+
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+    }
+
+    function revealCard() {
+      if (lockBoard || this.classList.contains('revealed') || this.classList.contains('matched')) return;
+
+      this.classList.add('revealed');
+      this.innerText = this.dataset.emoji;
+
+      if (!firstCard) {
+        firstCard = this;
+      } else {
+        secondCard = this;
+        lockBoard = true;
+
+        if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
+          firstCard.classList.add('matched');
+          secondCard.classList.add('matched');
+          resetTurn();
+        } else {
+          setTimeout(() => {
+            firstCard.classList.remove('revealed');
+            secondCard.classList.remove('revealed');
+            firstCard.innerText = '';
+            secondCard.innerText = '';
+            resetTurn();
+          }, 1000);
+        }
+      }
+    }
+
+    function resetTurn() {
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
